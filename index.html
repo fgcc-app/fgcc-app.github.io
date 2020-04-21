@@ -74,13 +74,13 @@ td { word-break: break-all; }
         <div class="column">
           <div class="ui segment">
             <h4 class="ui header">Original</h4>
-            <video width="300" height="225" data-bind="click: cameraTab.snapshot()"></video>
+            <video width="300" height="225" data-bind="click: () => cameraTab.snapshot()"></video>
           </div>
         </div>
         <div class="column">
           <div class="ui segment">
             <h4 class="ui header">Classified</h4>
-            <canvas width="300" height="225" data-bind="click: cameraTab.snapshot()"></canvas>
+            <canvas width="300" height="225" data-bind="click: () => cameraTab.snapshot()"></canvas>
           </div>
         </div>
     </div>
