@@ -2,6 +2,8 @@
 
 A JavaScript / HTML application that measures Fractional Green Canopy Cover (FGCC)
 
+Try it out: https://fgcc-app.github.io/
+
 ## fgcc.js
 
 A JavaScript class that computes FGCC
