@@ -131,29 +131,29 @@ td { word-break: break-all; }
 <script type="text/javascript">
 
 class FilesTab {
-	constructor(page) {
-  	this.page = page;
-  	this.results = ko.observableArray([]);
+  constructor(page) {
+    this.page = page;
+    this.results = ko.observableArray([]);
     this.processing = ko.observable(false);
   }
 
   clearResults() {
-  	this.results.removeAll();
+    this.results.removeAll();
   }
 
   copyResults(header) {
-  	var rows = [];
+    var rows = [];
     if (header) {
-      rows.push("name\tcoverage\tp1\tp2\tp3\tnoise")
+      rows.push("name  coverage  p1  p2  p3  noise")
     }
-  	for (var row of this.results()) {
-      rows.push(`${row.name}\t${row.coverage}\t${row.settings.p1}\t${row.settings.p2}\t${row.settings.p3}\t${row.settings.noise}`);
+    for (var row of this.results()) {
+      rows.push(`${row.name}  ${row.coverage}  ${row.settings.p1}  ${row.settings.p2}  ${row.settings.p3}  ${row.settings.noise}`);
     }
-  	navigator.clipboard.writeText(rows.join('\n'));
+    navigator.clipboard.writeText(rows.join('\n'));
   }
 
-	drop(e) {
-  	e.preventDefault();
+  drop(e) {
+    e.preventDefault();
     this.processing(true);
     this.processFiles(e.originalEvent.dataTransfer.files, 0, () => this.processing(false));
   }
@@ -167,25 +167,25 @@ class FilesTab {
       img.onload = () =>  this.processImage(img, callback);
       img.src = url;
     } else if (file.type.indexOf("video/") == 0) {
-    	var video = document.createElement("video");
+      var video = document.createElement("video");
       video.alt = file.name;
       video.src = url;
-    	this.processVideo(video, callback);
+      this.processVideo(video, callback);
     } else {
-    	callback();
+      callback();
     }
   }
 
   processFiles(files, i, callback) {
-  	if (i < files.length) {
+    if (i < files.length) {
       this.processFile(files[i++], () => this.processFiles(files, i, callback));
     } else {
-    	callback();
+      callback();
     }
   }
 
   processImage(image, callback) {
-  	var input = document.createElement("canvas");
+    var input = document.createElement("canvas");
     input.width = image.width;
     input.height = image.height;
 
@@ -199,8 +199,8 @@ class FilesTab {
     var classifier = this.page.settingsTab.classifier(input, output);
     var coverage = classifier.classify();
 
-		this.results.push({
-    	name: image.alt,
+    this.results.push({
+      name: image.alt,
       coverage: coverage.toFixed(5),
       original: input,
       classified: output,
@@ -211,8 +211,8 @@ class FilesTab {
   }
 
   processVideo(video, callback) {
-  	let increment = 1 / this.page.settingsTab.data.fps();
-  	video.load();
+    let increment = 1 / this.page.settingsTab.data.fps();
+    video.load();
     video.currentTime = increment;
     video.addEventListener("seeked", () => {
       let canvas = document.createElement("canvas");
@@ -233,39 +233,39 @@ class FilesTab {
 }
 
 class CameraTab {
-	constructor(page, input, output) {
-  	this.page = page;
-  	this.input = input;
+  constructor(page, input, output) {
+    this.page = page;
+    this.input = input;
     this.output = output;
     this.coverage = ko.observable(0);
   }
 
   loop(classifier, fps = 60) {
-  	if (!this.input.paused) {
-  		this.coverage(classifier.classify());
+    if (!this.input.paused) {
+      this.coverage(classifier.classify());
     }
     if (this.input.srcObject !== null) {
-    	setTimeout(() => this.loop(classifier, fps), 1000 / fps);
+      setTimeout(() => this.loop(classifier, fps), 1000 / fps);
     }
   }
 
   snapshot() {
     if (this.input.paused) {
-    	this.input.play();
+      this.input.play();
     } else {
-    	this.input.pause();
+      this.input.pause();
     }
   }
 
   start() {
-  	var camera = {
+    var camera = {
       video: {
         facingMode: "environment",
         width: { min: this.input.width, max: this.input.width },
         height: { min: this.input.height, max: this.input.height }
       }
     };
-  	navigator.mediaDevices.getUserMedia(camera).then(stream => {
+    navigator.mediaDevices.getUserMedia(camera).then(stream => {
       var classifier = this.page.settingsTab.classifier(this.input, this.output);
       this.input.srcObject = stream;
       this.input.play();
@@ -275,26 +275,26 @@ class CameraTab {
 
   stop() {
     if (this.input.srcObject) {
-    	this.input.pause();
-    	this.input.srcObject.getTracks().forEach(t => t.stop());
-    	this.input.srcObject = null;
+      this.input.pause();
+      this.input.srcObject.getTracks().forEach(t => t.stop());
+      this.input.srcObject = null;
     }
   }
 }
 
 class SettingsTab {
-	constructor(page) {
-  	this.p1 = ko.observable(0.95);
+  constructor(page) {
+    this.p1 = ko.observable(0.95);
     this.p2 = ko.observable(0.95);
     this.p3 = ko.observable(20);
     this.noise = ko.observable(1);
     this.fps = ko.observable(1);
-  	this.data = new SettingsData(this);
+    this.data = new SettingsData(this);
   }
 
 
-	classifier(input, output) {
-  	var instance = new FGCC(input, output);
+  classifier(input, output) {
+    var instance = new FGCC(input, output);
     instance.p1 = this.data.p1();
     instance.p2 = this.data.p2();
     instance.p3 = this.data.p3();
@@ -304,8 +304,8 @@ class SettingsTab {
 }
 
 class SettingsData {
-	constructor(tab) {
-		this.p1 = ko.computed(() => parseFloat(tab.p1()));
+  constructor(tab) {
+    this.p1 = ko.computed(() => parseFloat(tab.p1()));
     this.p2 = ko.computed(() => parseFloat(tab.p2()));
     this.p3 = ko.computed(() => parseFloat(tab.p3()));
     this.noise = ko.computed(() => parseInt(tab.noise()));
@@ -316,31 +316,31 @@ class SettingsData {
   }
 
   load(tab) {
-  	let data = localStorage["data"];
+    let data = localStorage["data"];
     if (data) {
-    	data = JSON.parse(data);
-    	tab.p1(data.p1);
-    	tab.p2(data.p2);
-    	tab.p3(data.p3);
+      data = JSON.parse(data);
+      tab.p1(data.p1);
+      tab.p2(data.p2);
+      tab.p3(data.p3);
       tab.noise(data.noise);
       tab.fps(data.fps);
     }
   }
 
   save(json) {
-  	localStorage["data"] = json
+    localStorage["data"] = json
   }
 }
 
 class Page {
-	constructor() {
-  	this.filesTab = new FilesTab(this);
+  constructor() {
+    this.filesTab = new FilesTab(this);
     this.cameraTab = new CameraTab(this, document.querySelector("#camera video"), document.querySelector("#camera canvas"));
-  	this.settingsTab = new SettingsTab(this);
+    this.settingsTab = new SettingsTab(this);
 
     $(".menu .item").tab({
-			onVisible: n => this.cameraTab[n == "camera" ? "start" : "stop"]()
-		});
+      onVisible: n => this.cameraTab[n == "camera" ? "start" : "stop"]()
+    });
   }
 }
 
