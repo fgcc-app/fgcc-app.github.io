@@ -58,7 +58,7 @@ class FGCC {
 
     for (var i = 0; i < data.length; i++) {
       var n = data[i];
-      data[i] = sizes[n] > this.noise ? 1 : 0;
+      data[i] = sizes[n] >= this.noise ? 1 : 0;
     }
 
     return data;
