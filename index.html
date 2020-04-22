@@ -149,10 +149,10 @@ class FilesTab {
   copyResults(header) {
     var rows = [];
     if (header) {
-      rows.push("name  coverage  p1  p2  p3  noise")
+      rows.push("name\tcoverage\tp1\tp2\tp3\tnoise")
     }
     for (var row of this.results()) {
-      rows.push(`${row.name}  ${row.coverage}  ${row.settings.p1}  ${row.settings.p2}  ${row.settings.p3}  ${row.settings.noise}`);
+      rows.push(`${row.name}\t${row.coverage}\t${row.settings.p1}\t${row.settings.p2}\t${row.settings.p3}\t${row.settings.noise}`);
     }
     navigator.clipboard.writeText(rows.join('\n'));
   }
