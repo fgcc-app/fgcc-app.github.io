@@ -8,6 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-latest.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"></link>
 
@@ -149,10 +150,10 @@ class FilesTab {
   copyResults(header) {
     var rows = [];
     if (header) {
-      rows.push("name\tcoverage\tp1\tp2\tp3\tnoise")
+      rows.push("name\tcoverage\tf_number\texposure_time\tp1\tp2\tp3\tnoise")
     }
     for (var row of this.results()) {
-      rows.push(`${row.name}\t${row.coverage}\t${row.settings.p1}\t${row.settings.p2}\t${row.settings.p3}\t${row.settings.noise}`);
+      rows.push(`${row.name}\t${row.coverage}\t${row.metadata.fNumber}\t${row.metadata.exposureTime}\t${row.settings.p1}\t${row.settings.p2}\t${row.settings.p3}\t${row.settings.noise}`);
     }
     navigator.clipboard.writeText(rows.join('\n'));
   }
@@ -204,15 +205,23 @@ class FilesTab {
     var classifier = this.page.settingsTab.classifier(input, output);
     var coverage = classifier.classify();
 
-    this.results.push({
-      name: image.alt,
-      coverage: coverage.toFixed(5),
-      original: input,
-      classified: output,
-      settings: { p1: classifier.p1, p2: classifier.p2, p3: classifier.p3, noise: classifier.noise }
-    });
+    EXIF.getData(image, () => {
+        var metadata = {
+            fNumber: EXIF.getTag(image, "FNumber") || "",
+            exposureTime: EXIF.getTag(image, "ExposureTime") || ""
+        };
 
-    callback();
+        this.results.push({
+          name: image.alt,
+          coverage: coverage.toFixed(5),
+          original: input,
+          classified: output,
+          metadata: metadata,
+          settings: { p1: classifier.p1, p2: classifier.p2, p3: classifier.p3, noise: classifier.noise }
+        });
+
+        callback();
+    });
   }
 
   processVideo(video, callback) {
